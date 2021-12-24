@@ -1,25 +1,34 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import { sendGetRequest } from "./axios/hooks";
+import { OrderList } from "./components/OrderList";
+import { useEffect, useState } from "react";
+import { IOrder } from "./axios/interfaces";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { OrderCreation } from "./components/OrderCreation";
 
 function App() {
+  const [orders, setOrders] = useState<IOrder[]>([]);
+  useEffect(() => {
+    const getOrders = async () => {
+      const allOrders = await sendGetRequest("order/GetAll");
+      if (allOrders) setOrders(allOrders);
+    };
+    getOrders();
+  }, []);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route
+          path="/"
+          element={<OrderList orders={orders} setOrders={setOrders} />}
+        />
+        <Route
+          path="create-order/:id"
+          element={<OrderCreation orders={orders} setOrders={setOrders} />}
+        ></Route>
+      </Routes>
+    </Router>
   );
 }
 
